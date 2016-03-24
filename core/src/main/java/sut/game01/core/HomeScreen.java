@@ -1,45 +1,49 @@
 package sut.game01.core;
 
-import playn.core.Font;
-import react.UnitSlot;
-import  tripleplay.game.ScreenStack;
-import  tripleplay.game.UIScreen;
+import static playn.core.PlayN.*;
+import playn.core.Image;
+import playn.core.ImageLayer;
+import playn.core.Mouse;
+import tripleplay.game.Screen;
+import tripleplay.game.ScreenStack;
+import playn.core.Mouse;
 import tripleplay.ui.*;
 import  tripleplay.ui.layout.*;
-import static playn.core.PlayN.*;
 
-public class HomeScreen extends UIScreen {
+public class HomeScreen extends Screen {
 
-    public  static final Font TITLE_FONT =
-            graphics().createFont("Helvetica", Font.Style.PLAIN, 24);
-    private final TestScreen testScreen;
     private ScreenStack ss;
-    private Root root;
+    private final TestScreen testScreen;
+    private final ImageLayer homeBg;
+    private final ImageLayer startButton;
+    private final ImageLayer logo;
 
-    public HomeScreen(ScreenStack ss){
+    public HomeScreen(final ScreenStack ss) {
         this.ss = ss;
         this.testScreen = new TestScreen(ss);
+        Image homeBgImage = assets().getImage("images/homeBg.png");
+        this.homeBg = graphics().createImageLayer(homeBgImage);
+
+        Image logoImage = assets().getImage("images/logo.png");
+        this.logo = graphics().createImageLayer(logoImage);
+        logo.setTranslation(110,40);
+
+        Image startButtonImage = assets().getImage("images/start.png");
+        this.startButton = graphics().createImageLayer(startButtonImage);
+        startButton.setTranslation(240,375);
+        startButton.addListener(new Mouse.LayerAdapter() {
+            @Override
+            public void onMouseUp(Mouse.ButtonEvent event) {
+                ss.push(testScreen);
+            }
+        });
     }
 
     @Override
-    public  void wasShown() {
+    public  void  wasShown() {
         super.wasShown();
-        root = iface.createRoot(
-                AxisLayout.vertical().gap(15),
-                SimpleStyles.newSheet(), layer);
-        root.addStyles(Style.BACKGROUND
-                .is(Background.bordered(0xFFCCCCCC, 0xFF99CCFF, 5)
-                        .inset(5,10)));
-        root.setSize(width(), height());
-
-        root.add(new Label("Event Driven Programming")
-                .addStyles(Style.FONT.is(HomeScreen.TITLE_FONT)));
-
-        root.add(new Button("Start").onClick(new UnitSlot(){
-            public  void onEmit() {
-                ss.push(testScreen);
-            }
-        }));
+        this.layer.add(homeBg);
+        this.layer.add(logo);
+        this.layer.add(startButton);
     }
-
 }
