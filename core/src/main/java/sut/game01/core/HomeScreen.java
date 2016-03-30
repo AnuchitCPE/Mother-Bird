@@ -21,6 +21,7 @@ public class HomeScreen extends Screen {
     public HomeScreen(final ScreenStack ss) {
         this.ss = ss;
         this.testScreen = new TestScreen(ss);
+
         Image homeBgImage = assets().getImage("images/homeBg.png");
         this.homeBg = graphics().createImageLayer(homeBgImage);
 
@@ -37,6 +38,7 @@ public class HomeScreen extends Screen {
                 ss.push(testScreen);
             }
         });
+
     }
 
     @Override
