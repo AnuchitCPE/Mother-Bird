@@ -1,6 +1,8 @@
 package sut.game01.core;
 
 import static playn.core.PlayN.*;
+
+import characters.Zealot;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.Mouse;
@@ -13,6 +15,7 @@ public class TestScreen extends Screen {
     private final ScreenStack ss;
     private final ImageLayer bg;
     private final ImageLayer backButton;
+    private Zealot zealot;
 
     public TestScreen(final ScreenStack ss) {
         this.ss = ss;
@@ -30,6 +33,7 @@ public class TestScreen extends Screen {
             }
         });
 
+
     }
 
     @Override
@@ -37,5 +41,14 @@ public class TestScreen extends Screen {
         super.wasShown();
         this.layer.add(bg);
         this.layer.add(backButton);
+        zealot = new Zealot(560f, 280f);
+        this.layer.add(zealot.layer());
+
+    }
+
+    @Override
+    public void update(int delta) {
+        super.update(delta);
+        zealot.update(delta);
     }
 }

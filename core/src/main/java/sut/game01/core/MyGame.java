@@ -25,6 +25,7 @@ public class MyGame extends Game.Default {
 
     @Override
     public void update(int delta) {
+        ss.update(delta);
     }
 
     @Override
