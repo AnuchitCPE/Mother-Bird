@@ -15,7 +15,6 @@ public class TestScreen extends Screen {
     private final ScreenStack ss;
     private final ImageLayer bg;
     private final ImageLayer backButton;
-    private int count = 0;
     private Zealot zealot;
 
     public TestScreen(final ScreenStack ss) {
@@ -37,10 +36,6 @@ public class TestScreen extends Screen {
 
     }
 
-    public void setCount(int count) {
-        this.count = count;
-    }
-
     @Override
     public  void  wasShown() {
         super.wasShown();
@@ -53,7 +48,6 @@ public class TestScreen extends Screen {
     @Override
     public void update(int delta) {
         super.update(delta);
-        zealot.setCount(count%3);
         zealot.update(delta);
     }
 }
