@@ -16,7 +16,6 @@ public class HomeScreen extends Screen {
     private final ImageLayer homeBg;
     private final ImageLayer startButton;
     private final ImageLayer logo;
-    private int count = 0;
 
     public HomeScreen(final ScreenStack ss) {
         this.ss = ss;
@@ -51,9 +50,6 @@ public class HomeScreen extends Screen {
             public void onKeyUp(Keyboard.Event event) {
                 if (event.key() == Key.ENTER) {
                     ss.push(testScreen);
-                }
-                else if (event.key() == Key.SPACE) {
-                    testScreen.setCount(count++);
                 }
             }
         });

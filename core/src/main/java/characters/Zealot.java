@@ -12,7 +12,6 @@ public class Zealot {
     private Sprite sprite;
     private int spriteIndex = 0;
     private boolean hasLoaded = false;
-    private int count = 0;
 
     public enum State {
         IDLE, RUN, ATTK
@@ -22,10 +21,6 @@ public class Zealot {
 
     private  int e = 0;
     private  int offset = 0;
-
-    public void setCount(int count) {
-        this.count = count;
-    }
 
     public Zealot(final float x, final float y) {
         sprite = SpriteLoader.getSprite("images/zealot.json");
@@ -51,12 +46,19 @@ public class Zealot {
 
     public  void update(int delta) {
         if (hasLoaded == false) return;
+        PlayN.keyboard().setListener(new Keyboard.Adapter(){
+            @Override
+            public void onKeyUp(Keyboard.Event event) {
+                if(event.key() == Key.SPACE) {
+                    switch (state) {
+                        case IDLE: state = State.RUN; break;
+                        case RUN: state = State.ATTK; break;
+                        case ATTK: state = State.IDLE; break;
+                    }
+                }
+            }
+        });
         e = e + delta;
-        switch (count%3) {
-            case 0: state = State.IDLE; break;
-            case 1: state = State.RUN; break;
-            case 2: state = State.ATTK; break;
-        }
         if (e > 150) {
             switch (state) {
                 case IDLE: offset = 0; break;
