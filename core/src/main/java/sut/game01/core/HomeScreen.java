@@ -1,9 +1,8 @@
 package sut.game01.core;
 
 import static playn.core.PlayN.*;
-import playn.core.Image;
-import playn.core.ImageLayer;
-import playn.core.Mouse;
+
+import playn.core.*;
 import tripleplay.game.Screen;
 import tripleplay.game.ScreenStack;
 import playn.core.Mouse;
@@ -17,6 +16,7 @@ public class HomeScreen extends Screen {
     private final ImageLayer homeBg;
     private final ImageLayer startButton;
     private final ImageLayer logo;
+    private int count = 0;
 
     public HomeScreen(final ScreenStack ss) {
         this.ss = ss;
@@ -38,7 +38,6 @@ public class HomeScreen extends Screen {
                 ss.push(testScreen);
             }
         });
-
     }
 
     @Override
@@ -47,5 +46,16 @@ public class HomeScreen extends Screen {
         this.layer.add(homeBg);
         this.layer.add(logo);
         this.layer.add(startButton);
+        keyboard().setListener(new Keyboard.Adapter(){
+            @Override
+            public void onKeyUp(Keyboard.Event event) {
+                if (event.key() == Key.ENTER) {
+                    ss.push(testScreen);
+                }
+                else if (event.key() == Key.SPACE) {
+                    testScreen.setCount(count++);
+                }
+            }
+        });
     }
 }

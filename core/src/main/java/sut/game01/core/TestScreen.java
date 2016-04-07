@@ -15,17 +15,18 @@ public class TestScreen extends Screen {
     private final ScreenStack ss;
     private final ImageLayer bg;
     private final ImageLayer backButton;
+    private int count = 0;
     private Zealot zealot;
 
     public TestScreen(final ScreenStack ss) {
         this.ss = ss;
-
         Image bgImage = assets().getImage("images/gameBg.png");
         this.bg = graphics().createImageLayer(bgImage);
 
         Image backImage = assets().getImage("images/back.png");
         this.backButton = graphics().createImageLayer(backImage);
         backButton.setTranslation(530,10);
+        zealot = new Zealot(560f, 280f);
         backButton.addListener(new Mouse.LayerAdapter() {
             @Override
             public void onMouseUp(Mouse.ButtonEvent event) {
@@ -36,12 +37,15 @@ public class TestScreen extends Screen {
 
     }
 
+    public void setCount(int count) {
+        this.count = count;
+    }
+
     @Override
     public  void  wasShown() {
         super.wasShown();
         this.layer.add(bg);
         this.layer.add(backButton);
-        zealot = new Zealot(560f, 280f);
         this.layer.add(zealot.layer());
 
     }
@@ -49,6 +53,7 @@ public class TestScreen extends Screen {
     @Override
     public void update(int delta) {
         super.update(delta);
+        zealot.setCount(count%3);
         zealot.update(delta);
     }
 }
