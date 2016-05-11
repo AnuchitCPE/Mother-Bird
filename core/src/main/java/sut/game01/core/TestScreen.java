@@ -40,7 +40,9 @@ public class TestScreen extends Screen {
     private int i = -1;
     public static HashMap<Body,String> bodies = new HashMap<Body, String>();
     public static int k = 0;
+    public static int j = 0;
     public static String debugString = "";
+    public static String debugStringCoin = "";
 
     public TestScreen(final ScreenStack ss) {
         this.ss = ss;
@@ -75,8 +77,10 @@ public class TestScreen extends Screen {
                 Body a = contact.getFixtureA().getBody();
                 Body b = contact.getFixtureB().getBody();
                 if (bodies.get(a) != null){
+                    j = j + 10;
                     debugString = bodies.get(a) + " contacted with " + bodies.get(b);
-                    b.applyForce(new Vec2(80f, -800f), b.getPosition());
+                    debugStringCoin = "Point : " + j;
+                    b.applyForce(new Vec2(80f, -100f), b.getPosition());
                 }
             }
 
@@ -146,7 +150,6 @@ public class TestScreen extends Screen {
         coinCircleShape.m_p.set(12f,9f);
         coinCircle.createFixture(coinCircleShape, 0.0f);
 
-
     }
 
     @Override
@@ -168,7 +171,8 @@ public class TestScreen extends Screen {
         if (showDebugDraw) {
             debugDraw.getCanvas().clear();
             debugDraw.getCanvas().setFillColor(Color.rgb(255, 255, 255));
-            debugDraw.getCanvas().drawText(debugString,100f,100f);
+            debugDraw.getCanvas().drawText(debugString,100f,50f);
+            debugDraw.getCanvas().drawText(debugStringCoin,100f,100f);
             world.drawDebugData();
         }
     }
