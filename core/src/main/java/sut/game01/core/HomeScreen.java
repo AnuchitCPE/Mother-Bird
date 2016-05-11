@@ -34,7 +34,7 @@ public class HomeScreen extends Screen {
         startButton.addListener(new Mouse.LayerAdapter() {
             @Override
             public void onMouseUp(Mouse.ButtonEvent event) {
-                ss.push(testScreen);
+                ss.push(new TestScreen(ss));
             }
         });
     }
