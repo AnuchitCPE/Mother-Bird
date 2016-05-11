@@ -8,6 +8,7 @@ import playn.core.Keyboard;
 import playn.core.Layer;
 import playn.core.PlayN;
 import playn.core.util.Callback;
+import playn.core.util.Clock;
 import sprite.Sprite;
 import sprite.SpriteLoader;
 import sut.game01.core.TestScreen;
@@ -52,7 +53,6 @@ public class Zealot {
     public Layer layer() {
         return sprite.layer();
     }
-
 
     private Body initPhysicsBody(World world, float x, float y) {
         BodyDef bodyDef = new BodyDef();
@@ -99,8 +99,12 @@ public class Zealot {
             sprite.setSprite(spriteIndex);
             e = 0;
         }
+    }
+
+    public void paint(Clock clock) {
+        if (!hasLoaded) return;
         sprite.layer().setTranslation(
                 (body.getPosition().x / TestScreen.M_PER_PIXEL) - 10,
-                body.getPosition().y /TestScreen.M_PER_PIXEL);
+                body.getPosition().y / TestScreen.M_PER_PIXEL);
     }
 }
