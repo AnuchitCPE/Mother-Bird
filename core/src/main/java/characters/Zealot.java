@@ -74,7 +74,7 @@ public class Zealot {
         fixtureDef.shape = shape;
         fixtureDef.density = 0.4f;
         fixtureDef.friction = 0.1f;
-        fixtureDef.restitution = 0.8f;
+        fixtureDef.restitution = 0.5f;
         body.createFixture(fixtureDef);
 
         body.setLinearDamping(0.2f);
@@ -94,6 +94,15 @@ public class Zealot {
                         case RUN: state = State.ATTK; break;
                         case ATTK: state = State.IDLE; break;
                     }
+                }else if (event.key() == Key.LEFT) {
+                    state = State.RUN;
+                    body.applyForce(new Vec2(-100f,0f), body.getPosition());
+                }else if (event.key() == Key.RIGHT) {
+                    state = State.RUN;
+                    body.applyForce(new Vec2(100f,0f), body.getPosition());
+                }else if (event.key() == Key.UP) {
+                    state = State.IDLE;
+                    body.applyForce(new Vec2(-10f, -800f), body.getPosition());
                 }
             }
         });
@@ -108,11 +117,12 @@ public class Zealot {
             sprite.setSprite(spriteIndex);
             e = 0;
         }
+
     }
 
     public void paint(Clock clock) {
         if (!hasLoaded) return;
-        sprite.layer().setRotation(body.getAngle());
+        //sprite.layer().setRotation(body.getAngle());
         sprite.layer().setTranslation(
                 (body.getPosition().x / TestScreen.M_PER_PIXEL) - 10,
                 body.getPosition().y / TestScreen.M_PER_PIXEL);
