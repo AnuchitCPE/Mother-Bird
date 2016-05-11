@@ -29,6 +29,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="game01" target="1.5" />
       <module name="game01-assets" target="1.6" />
       <module name="game01-core" target="1.6" />
       <module name="game01-java" target="1.6" />
