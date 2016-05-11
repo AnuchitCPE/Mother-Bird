@@ -1,17 +1,20 @@
 package characters;
 
+import org.jbox2d.callbacks.ContactImpulse;
+import org.jbox2d.callbacks.ContactListener;
+import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
-import playn.core.Key;
-import playn.core.Keyboard;
-import playn.core.Layer;
-import playn.core.PlayN;
+import org.jbox2d.dynamics.contacts.Contact;
+import playn.core.*;
 import playn.core.util.Callback;
 import playn.core.util.Clock;
 import sprite.Sprite;
 import sprite.SpriteLoader;
 import sut.game01.core.TestScreen;
+
+import java.util.HashMap;
 
 public class Zealot {
     private Sprite sprite;
@@ -48,6 +51,8 @@ public class Zealot {
                 PlayN.log().error("Error loading image!", cause);
             }
         });
+
+
     }
 
     public Layer layer() {
@@ -60,18 +65,22 @@ public class Zealot {
         bodyDef.position = new Vec2(0,0);
         Body body = world.createBody(bodyDef);
 
+        TestScreen.bodies.put(body, "test_" + TestScreen.k);
+        TestScreen.k++;
+
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(56 * TestScreen.M_PER_PIXEL / 2, sprite.layer().height()*TestScreen.M_PER_PIXEL / 2);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 0.4f;
         fixtureDef.friction = 0.1f;
-        fixtureDef.restitution = 0.35f;
+        fixtureDef.restitution = 0.8f;
         body.createFixture(fixtureDef);
 
         body.setLinearDamping(0.2f);
         body.setTransform(new Vec2(x,y), 0f);
         return body;
+
     }
 
     public  void update(int delta) {
@@ -103,6 +112,7 @@ public class Zealot {
 
     public void paint(Clock clock) {
         if (!hasLoaded) return;
+        sprite.layer().setRotation(body.getAngle());
         sprite.layer().setTranslation(
                 (body.getPosition().x / TestScreen.M_PER_PIXEL) - 10,
                 body.getPosition().y / TestScreen.M_PER_PIXEL);
