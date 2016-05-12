@@ -2,13 +2,12 @@ package sut.game01.core;
 
 import static playn.core.PlayN.*;
 
-import characters.Zealot;
+import characters.Bird;
 import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.EdgeShape;
-import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.dynamics.*;
 import org.jbox2d.dynamics.contacts.Contact;
 import playn.core.DebugDrawBox2D;
@@ -22,7 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class TestScreen extends Screen {
+public class GameScreen extends Screen {
 
     public static float M_PER_PIXEL = 1 / 26.666667f;  //size of world
     public static int width = 24; // 640 px in physic unit (meter)
@@ -35,8 +34,8 @@ public class TestScreen extends Screen {
     private final ImageLayer bg;
     private final ImageLayer backButton;
     private final ImageLayer coin;
-    private Zealot zealot;
-    private List<Zealot> zealotMap;
+    private Bird bird;
+    private List<Bird> birdMap;
     private int i = -1;
     public static HashMap<Body,String> bodies = new HashMap<Body, String>();
     public static int k = 0;
@@ -44,10 +43,10 @@ public class TestScreen extends Screen {
     public static String debugString = "";
     public static String debugStringCoin = "";
 
-    public TestScreen(final ScreenStack ss) {
+    public GameScreen(final ScreenStack ss) {
         this.ss = ss;
         graphics().rootLayer().clear();
-        zealotMap = new ArrayList<Zealot>();
+        birdMap = new ArrayList<Bird>();
         Image bgImage = assets().getImage("images/gameBg.png");
         this.bg = graphics().createImageLayer(bgImage);
 
@@ -63,6 +62,9 @@ public class TestScreen extends Screen {
             @Override
             public void onMouseUp(Mouse.ButtonEvent event) {
                 ss.remove(ss.top());
+                ss.push(new HomeScreen(ss));
+                j = 0;
+                k = 0;
             }
         });
 
@@ -80,6 +82,7 @@ public class TestScreen extends Screen {
                     j = j + 10;
                     debugString = bodies.get(a) + " contacted with " + bodies.get(b);
                     debugStringCoin = "Point : " + j;
+                    //bird.state = Bird.State.DIE;
                     b.applyForce(new Vec2(80f, -100f), b.getPosition());
                 }
             }
@@ -103,10 +106,10 @@ public class TestScreen extends Screen {
         mouse().setListener(new Mouse.Adapter(){
             @Override
             public void onMouseUp(Mouse.ButtonEvent event) {
-                zealotMap.add(new Zealot(world, (float)event.x(), (float)event.y()));
+                birdMap.add(new Bird(world, (float)event.x(), (float)event.y()));
                 i++;
                 for (int c = 0 ; c <= i ; c++){
-                    graphics().rootLayer().add(zealotMap.get(c).layer());
+                    graphics().rootLayer().add(birdMap.get(c).layer());
                 }
 
             }
@@ -123,8 +126,8 @@ public class TestScreen extends Screen {
 
         if (showDebugDraw) {
             CanvasImage image = graphics().createImage(
-                    (int) (width / TestScreen.M_PER_PIXEL),
-                    (int) (height / TestScreen.M_PER_PIXEL));
+                    (int) (width / GameScreen.M_PER_PIXEL),
+                    (int) (height / GameScreen.M_PER_PIXEL));
             layer.add(graphics().createImageLayer(image));
             debugDraw = new DebugDrawBox2D();
             debugDraw.setCanvas(image);
@@ -135,7 +138,7 @@ public class TestScreen extends Screen {
             debugDraw.setFlags( debugDraw.e_shapeBit |
                                 debugDraw.e_jointBit |
                                 debugDraw.e_aabbBit);
-            debugDraw.setCamera(0, 0, 1f / TestScreen.M_PER_PIXEL);
+            debugDraw.setCamera(0, 0, 1f / GameScreen.M_PER_PIXEL);
             world.setDebugDraw(debugDraw);
         }
 
@@ -144,11 +147,27 @@ public class TestScreen extends Screen {
         groundShape.set(new Vec2(0, height), new Vec2(width, height));
         ground.createFixture(groundShape, 0.0f);
 
+        Body groundT = world.createBody(new BodyDef());
+        EdgeShape groundTShape = new EdgeShape();
+        groundTShape.set(new Vec2(0, 0), new Vec2(24,0));
+        groundT.createFixture(groundTShape, 0.0f);
+
+        Body groundL = world.createBody(new BodyDef());
+        EdgeShape groundLShape = new EdgeShape();
+        groundLShape.set(new Vec2(0, 0), new Vec2(0,18));
+        groundL.createFixture(groundLShape, 0.0f);
+
+        Body groundR = world.createBody(new BodyDef());
+        EdgeShape groundRShape = new EdgeShape();
+        groundRShape.set(new Vec2(24, 0), new Vec2(24,18));
+        groundR.createFixture(groundRShape, 0.0f);
+
         Body coinCircle = world.createBody(new BodyDef());
         CircleShape coinCircleShape = new CircleShape();
         coinCircleShape.setRadius(1.0f);
         coinCircleShape.m_p.set(12f,9f);
         coinCircle.createFixture(coinCircleShape, 0.0f);
+        bodies.put(coinCircle,"Coin");
 
     }
 
@@ -156,7 +175,7 @@ public class TestScreen extends Screen {
     public void update(int delta) {
         super.update(delta);
         for (int c = 0 ; c <= i ; c++){
-            zealotMap.get(c).update(delta);
+            birdMap.get(c).update(delta);
         }
 
         world.step(0.033f, 10, 10);
@@ -166,7 +185,7 @@ public class TestScreen extends Screen {
     public void paint(Clock clock) {
         super.paint(clock);
         for (int c = 0 ; c <= i ; c++){
-            zealotMap.get(c).paint(clock);
+            birdMap.get(c).paint(clock);
         }
         if (showDebugDraw) {
             debugDraw.getCanvas().clear();

@@ -1,38 +1,32 @@
 package characters;
 
-import org.jbox2d.callbacks.ContactImpulse;
-import org.jbox2d.callbacks.ContactListener;
-import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
-import org.jbox2d.dynamics.contacts.Contact;
 import playn.core.*;
 import playn.core.util.Callback;
 import playn.core.util.Clock;
 import sprite.Sprite;
 import sprite.SpriteLoader;
-import sut.game01.core.TestScreen;
+import sut.game01.core.GameScreen;
 
-import java.util.HashMap;
-
-public class Zealot {
+public class Bird {
     private Sprite sprite;
     private int spriteIndex = 0;
     private boolean hasLoaded = false;
     private Body body;
 
     public enum State {
-        IDLE, RUN, ATTK
+        IDLE, FLY, DIE
     };
 
-    private  State state = State.IDLE;
+    public State state = State.IDLE;
 
     private  int e = 0;
     private  int offset = 0;
 
-    public Zealot(final World world, final float x_px, final float y_px) {
-        sprite = SpriteLoader.getSprite("images/zealot.json");
+    public Bird(final World world, final float x_px, final float y_px) {
+        sprite = SpriteLoader.getSprite("images/bird.json");
         sprite.addCallback(new Callback<Sprite>() {
             @Override
             public void onSuccess(Sprite result) {
@@ -41,8 +35,8 @@ public class Zealot {
                 sprite.layer().setTranslation(x_px, y_px + 13f);
 
                 body = initPhysicsBody(world,
-                        TestScreen.M_PER_PIXEL * x_px,
-                        TestScreen.M_PER_PIXEL * y_px);
+                        GameScreen.M_PER_PIXEL * x_px,
+                        GameScreen.M_PER_PIXEL * y_px);
                 hasLoaded = true;
             }
 
@@ -65,11 +59,11 @@ public class Zealot {
         bodyDef.position = new Vec2(0,0);
         Body body = world.createBody(bodyDef);
 
-        TestScreen.bodies.put(body, "test_" + TestScreen.k);
-        TestScreen.k++;
+        GameScreen.bodies.put(body, "test_" + GameScreen.k);
+        GameScreen.k++;
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(56 * TestScreen.M_PER_PIXEL / 2, sprite.layer().height()*TestScreen.M_PER_PIXEL / 2);
+        shape.setAsBox(80 * GameScreen.M_PER_PIXEL / 2, sprite.layer().height()* GameScreen.M_PER_PIXEL / 2);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 0.4f;
@@ -90,19 +84,19 @@ public class Zealot {
             public void onKeyUp(Keyboard.Event event) {
                 if(event.key() == Key.SPACE) {
                     switch (state) {
-                        case IDLE: state = State.RUN; break;
-                        case RUN: state = State.ATTK; break;
-                        case ATTK: state = State.IDLE; break;
+                        case IDLE: state = State.FLY; break;
+                        case FLY: state = State.DIE; break;
+                        case DIE: state = State.IDLE; break;
                     }
                 }else if (event.key() == Key.LEFT) {
-                    state = State.RUN;
-                    body.applyForce(new Vec2(-100f,0f), body.getPosition());
-                }else if (event.key() == Key.RIGHT) {
-                    state = State.RUN;
-                    body.applyForce(new Vec2(100f,0f), body.getPosition());
-                }else if (event.key() == Key.UP) {
                     state = State.IDLE;
-                    body.applyForce(new Vec2(-10f, -800f), body.getPosition());
+                    body.applyForce(new Vec2(-80f,0f), body.getPosition());
+                }else if (event.key() == Key.RIGHT) {
+                    state = State.IDLE;
+                    body.applyForce(new Vec2(80f,0f), body.getPosition());
+                }else if (event.key() == Key.UP) {
+                    state = State.FLY;
+                    body.applyForce(new Vec2(0f, -500f), body.getPosition());
                 }
             }
         });
@@ -110,10 +104,10 @@ public class Zealot {
         if (e > 150) {
             switch (state) {
                 case IDLE: offset = 0; break;
-                case RUN: offset = 4; break;
-                case ATTK: offset = 8; break;
+                case FLY: offset = 5; break;
+                case DIE: offset = 10; break;
             }
-            spriteIndex = offset + ((spriteIndex + 1) % 4);
+            spriteIndex = offset + ((spriteIndex + 1) % 5);
             sprite.setSprite(spriteIndex);
             e = 0;
         }
@@ -124,7 +118,7 @@ public class Zealot {
         if (!hasLoaded) return;
         //sprite.layer().setRotation(body.getAngle());
         sprite.layer().setTranslation(
-                (body.getPosition().x / TestScreen.M_PER_PIXEL) - 10,
-                body.getPosition().y / TestScreen.M_PER_PIXEL);
+                (body.getPosition().x / GameScreen.M_PER_PIXEL) - 10,
+                body.getPosition().y / GameScreen.M_PER_PIXEL);
     }
 }

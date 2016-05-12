@@ -6,20 +6,18 @@ import playn.core.*;
 import tripleplay.game.Screen;
 import tripleplay.game.ScreenStack;
 import playn.core.Mouse;
-import tripleplay.ui.*;
-import  tripleplay.ui.layout.*;
 
 public class HomeScreen extends Screen {
 
     private ScreenStack ss;
-    private final TestScreen testScreen;
+    private final GameScreen gameScreen;
     private final ImageLayer homeBg;
     private final ImageLayer startButton;
     private final ImageLayer logo;
 
     public HomeScreen(final ScreenStack ss) {
         this.ss = ss;
-        this.testScreen = new TestScreen(ss);
+        this.gameScreen = new GameScreen(ss);
 
         Image homeBgImage = assets().getImage("images/homeBg.png");
         this.homeBg = graphics().createImageLayer(homeBgImage);
@@ -34,7 +32,8 @@ public class HomeScreen extends Screen {
         startButton.addListener(new Mouse.LayerAdapter() {
             @Override
             public void onMouseUp(Mouse.ButtonEvent event) {
-                ss.push(new TestScreen(ss));
+                ss.remove(ss.top());
+                ss.push(new GameScreen(ss));
             }
         });
     }
@@ -49,7 +48,7 @@ public class HomeScreen extends Screen {
             @Override
             public void onKeyUp(Keyboard.Event event) {
                 if (event.key() == Key.ENTER) {
-                    ss.push(testScreen);
+                    ss.push(gameScreen);
                 }
             }
         });
