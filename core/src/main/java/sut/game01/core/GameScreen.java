@@ -3,6 +3,7 @@ package sut.game01.core;
 import static playn.core.PlayN.*;
 
 import characters.Bird;
+import characters.Food;
 import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.collision.Manifold;
@@ -20,6 +21,7 @@ import tripleplay.game.ScreenStack;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 public class GameScreen extends Screen {
 
@@ -33,13 +35,19 @@ public class GameScreen extends Screen {
     private final ScreenStack ss;
     private final ImageLayer bg;
     private final ImageLayer backButton;
-    private final ImageLayer coin;
+    //private final ImageLayer food;
     private Bird bird;
+    private Food food1;
+    private Food food2;
+    private Food food3;
     private List<Bird> birdMap;
     private int i = -1;
     public static HashMap<Body,String> bodies = new HashMap<Body, String>();
     public static int k = 0;
+    public static int f = -2;
+    public static int f1 = 0;
     public static int j = 0;
+    public static float x = 0f;
     public static String debugString = "";
     public static String debugStringCoin = "";
 
@@ -50,9 +58,9 @@ public class GameScreen extends Screen {
         Image bgImage = assets().getImage("images/gameBg.png");
         this.bg = graphics().createImageLayer(bgImage);
 
-        Image coinImage = assets().getImage("images/Coin.png");
-        this.coin = graphics().createImageLayer(coinImage);
-        coin.setTranslation(295,215);
+        /*Image foodImage = assets().getImage("images/food.png");
+        this.food = graphics().createImageLayer(foodImage);
+        food.setTranslation(300,220);*/
 
 
         Image backImage = assets().getImage("images/back.png");
@@ -65,6 +73,7 @@ public class GameScreen extends Screen {
                 ss.push(new HomeScreen(ss));
                 j = 0;
                 k = 0;
+                x = 0f;
             }
         });
 
@@ -78,6 +87,7 @@ public class GameScreen extends Screen {
             public void beginContact(Contact contact) {
                 Body a = contact.getFixtureA().getBody();
                 Body b = contact.getFixtureB().getBody();
+
                 if (bodies.get(a) != null){
                     j = j + 10;
                     debugString = bodies.get(a) + " contacted with " + bodies.get(b);
@@ -86,7 +96,6 @@ public class GameScreen extends Screen {
                     b.applyForce(new Vec2(80f, -100f), b.getPosition());
                 }
             }
-
             @Override
             public void endContact(Contact contact) {
 
@@ -102,6 +111,31 @@ public class GameScreen extends Screen {
 
             }
         });
+        food1 = new Food(world, 600f, 240f);
+        food2 = new Food(world, 1200f, 100f);
+        food3 = new Food(world, 300f, 400f);
+        bird = new Bird(world, 50f, 100f);
+
+        /*Random rand = new Random();
+        int nRand = rand.nextInt(3) +1;
+        if(nRand ==1)
+            createFood(f1);
+        else if(nRand ==2)
+            createCan(canNum);
+        else if(nRand ==3)
+            createBottleGlass(bottleGlassNum);*/
+    }
+
+    @Override
+    public  void  wasShown() {
+        super.wasShown();
+        this.layer.add(bg);
+        this.layer.add(backButton);
+        this.layer.add(bird.layer());
+
+        this.layer.add(food1.layer());
+        this.layer.add(food2.layer());
+        this.layer.add(food3.layer());
 
         mouse().setListener(new Mouse.Adapter(){
             @Override
@@ -114,15 +148,6 @@ public class GameScreen extends Screen {
 
             }
         });
-
-    }
-
-    @Override
-    public  void  wasShown() {
-        super.wasShown();
-        this.layer.add(bg);
-        this.layer.add(backButton);
-        this.layer.add(coin);
 
         if (showDebugDraw) {
             CanvasImage image = graphics().createImage(
@@ -152,22 +177,22 @@ public class GameScreen extends Screen {
         groundTShape.set(new Vec2(0, 0), new Vec2(24,0));
         groundT.createFixture(groundTShape, 0.0f);
 
-        Body groundL = world.createBody(new BodyDef());
+        /*Body groundL = world.createBody(new BodyDef());
         EdgeShape groundLShape = new EdgeShape();
         groundLShape.set(new Vec2(0, 0), new Vec2(0,18));
-        groundL.createFixture(groundLShape, 0.0f);
+        groundL.createFixture(groundLShape, 0.0f);*/
 
-        Body groundR = world.createBody(new BodyDef());
+       /*Body groundR = world.createBody(new BodyDef());
         EdgeShape groundRShape = new EdgeShape();
         groundRShape.set(new Vec2(24, 0), new Vec2(24,18));
-        groundR.createFixture(groundRShape, 0.0f);
+        groundR.createFixture(groundRShape, 0.0f);*/
 
-        Body coinCircle = world.createBody(new BodyDef());
-        CircleShape coinCircleShape = new CircleShape();
-        coinCircleShape.setRadius(1.0f);
-        coinCircleShape.m_p.set(12f,9f);
-        coinCircle.createFixture(coinCircleShape, 0.0f);
-        bodies.put(coinCircle,"Coin");
+        /*Body foodCircle = world.createBody(new BodyDef());
+        CircleShape foodCircleShape = new CircleShape();
+        foodCircleShape.setRadius(0.85f);
+        foodCircleShape.m_p.set(12f,9f);
+        foodCircle.createFixture(foodCircleShape, 0.0f);
+        bodies.put(foodCircle,"food");*/
 
     }
 
@@ -178,6 +203,16 @@ public class GameScreen extends Screen {
             birdMap.get(c).update(delta);
         }
 
+        if (x > -1250f){
+            x -= 0.3f * 5;
+            bg.setTranslation(x,0);
+           // foods.body().applyForce(new Vec2(10,0),foods.body().getPosition());
+        }
+        bird.update(delta);
+        food1.update(delta);
+        food2.update(delta);
+        food3.update(delta);
+
         world.step(0.033f, 10, 10);
     }
 
@@ -187,6 +222,11 @@ public class GameScreen extends Screen {
         for (int c = 0 ; c <= i ; c++){
             birdMap.get(c).paint(clock);
         }
+        food1.paint(clock);
+        food2.paint(clock);
+        food3.paint(clock);
+        bird.paint(clock);
+
         if (showDebugDraw) {
             debugDraw.getCanvas().clear();
             debugDraw.getCanvas().setFillColor(Color.rgb(255, 255, 255));
@@ -195,4 +235,9 @@ public class GameScreen extends Screen {
             world.drawDebugData();
         }
     }
+
+
+    /*public void createFood(int foodTotal) {
+        this.f1 = foodTotal;
+    }*/
 }
