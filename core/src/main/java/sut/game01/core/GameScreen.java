@@ -35,14 +35,10 @@ public class GameScreen extends Screen {
     private final ScreenStack ss;
     private final ImageLayer bg;
     private final ImageLayer backButton;
-    //private final ImageLayer food;
     private Bird bird;
-    private Food food1;
-    private Food food2;
-    private Food food3;
-    private List<Bird> birdMap;
+    private List<Food> foodMap;
     private int i = -1;
-    public static HashMap<Body,String> bodies = new HashMap<Body, String>();
+    public static HashMap<Object,String> bodies = new HashMap<Object, String>();
     public static int k = 0;
     public static int f = -2;
     public static int f1 = 0;
@@ -54,14 +50,9 @@ public class GameScreen extends Screen {
     public GameScreen(final ScreenStack ss) {
         this.ss = ss;
         graphics().rootLayer().clear();
-        birdMap = new ArrayList<Bird>();
+        foodMap = new ArrayList<Food>();
         Image bgImage = assets().getImage("images/gameBg.png");
         this.bg = graphics().createImageLayer(bgImage);
-
-        /*Image foodImage = assets().getImage("images/food.png");
-        this.food = graphics().createImageLayer(foodImage);
-        food.setTranslation(300,220);*/
-
 
         Image backImage = assets().getImage("images/back.png");
         this.backButton = graphics().createImageLayer(backImage);
@@ -77,10 +68,17 @@ public class GameScreen extends Screen {
             }
         });
 
+
+
         Vec2 gravity = new Vec2(0.0f , 10.0f);
         world = new World(gravity);
         world.setWarmStarting(true);
         world.setAutoClearForces(true);
+
+        foodMap.add(new Food(world, 600f, 240f));
+        foodMap.add(new Food(world, 1200f, 100f));
+        foodMap.add(new Food(world, 300f, 400f));
+        bird = new Bird(world, 100f, 100f);
 
         world.setContactListener(new ContactListener() {
             @Override
@@ -88,12 +86,25 @@ public class GameScreen extends Screen {
                 Body a = contact.getFixtureA().getBody();
                 Body b = contact.getFixtureB().getBody();
 
-                if (bodies.get(a) != null){
-                    j = j + 10;
-                    debugString = bodies.get(a) + " contacted with " + bodies.get(b);
-                    debugStringCoin = "Point : " + j;
-                    //bird.state = Bird.State.DIE;
-                    b.applyForce(new Vec2(80f, -100f), b.getPosition());
+                for (Food food : foodMap) {
+                    if ((contact.getFixtureA().getBody() == bird.getBody() && contact.getFixtureB().getBody() == food.getBody())) {
+                        j = j + 10;
+                        debugString = bodies.get(a) + " contacted with " + bodies.get(b);
+                        debugStringCoin = "Point : " + j;
+                        b.setActive(false);
+                        food.layer().setVisible(false);
+                        bird.die();
+                        //a.setActive(false);
+                    }
+                    if ((contact.getFixtureA().getBody() == food.getBody() && contact.getFixtureB().getBody() == bird.getBody())) {
+                        j = j + 10;
+                        debugString = bodies.get(a) + " contacted with " + bodies.get(b);
+                        debugStringCoin = "Point : " + j;
+                        a.setActive(false);
+                        food.layer().setVisible(false);
+                        bird.die();
+                        //b.setActive(false);
+                    }
                 }
             }
             @Override
@@ -111,10 +122,6 @@ public class GameScreen extends Screen {
 
             }
         });
-        food1 = new Food(world, 600f, 240f);
-        food2 = new Food(world, 1200f, 100f);
-        food3 = new Food(world, 300f, 400f);
-        bird = new Bird(world, 50f, 100f);
 
         /*Random rand = new Random();
         int nRand = rand.nextInt(3) +1;
@@ -133,21 +140,9 @@ public class GameScreen extends Screen {
         this.layer.add(backButton);
         this.layer.add(bird.layer());
 
-        this.layer.add(food1.layer());
-        this.layer.add(food2.layer());
-        this.layer.add(food3.layer());
-
-        mouse().setListener(new Mouse.Adapter(){
-            @Override
-            public void onMouseUp(Mouse.ButtonEvent event) {
-                birdMap.add(new Bird(world, (float)event.x(), (float)event.y()));
-                i++;
-                for (int c = 0 ; c <= i ; c++){
-                    graphics().rootLayer().add(birdMap.get(c).layer());
-                }
-
-            }
-        });
+        for (Food food : foodMap){
+            this.layer.add(food.layer());
+        }
 
         if (showDebugDraw) {
             CanvasImage image = graphics().createImage(
@@ -171,6 +166,7 @@ public class GameScreen extends Screen {
         EdgeShape groundShape = new EdgeShape();
         groundShape.set(new Vec2(0, height), new Vec2(width, height));
         ground.createFixture(groundShape, 0.0f);
+        bodies.put(ground,"ground");
 
         Body groundT = world.createBody(new BodyDef());
         EdgeShape groundTShape = new EdgeShape();
@@ -187,31 +183,21 @@ public class GameScreen extends Screen {
         groundRShape.set(new Vec2(24, 0), new Vec2(24,18));
         groundR.createFixture(groundRShape, 0.0f);*/
 
-        /*Body foodCircle = world.createBody(new BodyDef());
-        CircleShape foodCircleShape = new CircleShape();
-        foodCircleShape.setRadius(0.85f);
-        foodCircleShape.m_p.set(12f,9f);
-        foodCircle.createFixture(foodCircleShape, 0.0f);
-        bodies.put(foodCircle,"food");*/
-
     }
 
     @Override
     public void update(int delta) {
         super.update(delta);
-        for (int c = 0 ; c <= i ; c++){
-            birdMap.get(c).update(delta);
-        }
 
         if (x > -1250f){
             x -= 0.3f * 5;
             bg.setTranslation(x,0);
-           // foods.body().applyForce(new Vec2(10,0),foods.body().getPosition());
         }
         bird.update(delta);
-        food1.update(delta);
-        food2.update(delta);
-        food3.update(delta);
+
+        for (Food food : foodMap){
+            food.update(delta);
+        }
 
         world.step(0.033f, 10, 10);
     }
@@ -219,13 +205,10 @@ public class GameScreen extends Screen {
     @Override
     public void paint(Clock clock) {
         super.paint(clock);
-        for (int c = 0 ; c <= i ; c++){
-            birdMap.get(c).paint(clock);
-        }
-        food1.paint(clock);
-        food2.paint(clock);
-        food3.paint(clock);
         bird.paint(clock);
+        for (Food food : foodMap){
+            food.paint(clock);
+        }
 
         if (showDebugDraw) {
             debugDraw.getCanvas().clear();

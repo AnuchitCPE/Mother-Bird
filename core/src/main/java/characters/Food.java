@@ -116,6 +116,11 @@ public class Food {
                 body.getPosition().y / GameScreen.M_PER_PIXEL);
 
     }
+
+    public Body getBody() {
+        return body;
+    }
+
     /*public Body body(){
         return this.body;
     }
