@@ -11,8 +11,8 @@ import sprite.SpriteLoader;
 import sut.game01.core.GameScreen;
 
 public class Bird {
-    private Sprite sprite;
-    private int spriteIndex = 0;
+    public Sprite sprite;
+    public int spriteIndex = 0;
     private boolean hasLoaded = false;
     private Body body;
 
@@ -22,8 +22,8 @@ public class Bird {
 
     public State state = State.IDLE;
 
-    private  int e = 0;
-    private  int offset = 0;
+    private int e = 0;
+    public int offset = 0;
 
     public Bird(final World world, final float x_px, final float y_px) {
         sprite = SpriteLoader.getSprite("images/bird.json");
@@ -68,7 +68,7 @@ public class Bird {
         fixtureDef.shape = shape;
         fixtureDef.density = 0.4f;
         fixtureDef.friction = 0.1f;
-        fixtureDef.restitution = 0.5f;
+        fixtureDef.restitution = 0.35f;
         body.createFixture(fixtureDef);
 
         body.setLinearDamping(0.2f);
@@ -96,7 +96,7 @@ public class Bird {
                     body.applyForce(new Vec2(80f,0f), body.getPosition());
                 }else if (event.key() == Key.UP) {
                     state = State.FLY;
-                    body.applyForce(new Vec2(0f, -500f), body.getPosition());
+                    body.applyForce(new Vec2(0f, -700f), body.getPosition());
                 }
             }
         });
@@ -107,8 +107,12 @@ public class Bird {
                 case FLY: offset = 5; break;
                 case DIE: offset = 10; break;
             }
-            spriteIndex = offset + ((spriteIndex + 1) % 5);
-            sprite.setSprite(spriteIndex);
+            if (spriteIndex != 14) {
+                spriteIndex = offset + ((spriteIndex + 1) % 5);
+                sprite.setSprite(spriteIndex);
+            }else{
+                sprite.setSprite(spriteIndex);
+            }
             e = 0;
         }
 
@@ -120,5 +124,28 @@ public class Bird {
         sprite.layer().setTranslation(
                 (body.getPosition().x / GameScreen.M_PER_PIXEL) - 10,
                 body.getPosition().y / GameScreen.M_PER_PIXEL);
+    }
+
+    public Body getBody() {
+        return body;
+    }
+
+    public void die(){
+        state = state.DIE;
+        e = e + 5;
+        if (e > 150) {
+            switch (state) {
+                case IDLE: offset = 0; break;
+                case FLY: offset = 5; break;
+                case DIE: offset = 10; break;
+            }
+            if (spriteIndex != 14) {
+                spriteIndex = offset + ((spriteIndex + 1) % 5);
+                sprite.setSprite(spriteIndex);
+            }else{
+                sprite.setSprite(spriteIndex);
+            }
+            e = 0;
+        }
     }
 }
