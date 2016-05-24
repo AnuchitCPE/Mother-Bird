@@ -94,7 +94,7 @@ public class Bird {
                 }else if (event.key() == Key.RIGHT) {
                     state = State.IDLE;
                     body.applyForce(new Vec2(80f,0f), body.getPosition());
-                }else if (event.key() == Key.UP) {
+                }else if (event.key() == Key.UP && state != State.DIE) {
                     state = State.FLY;
                     body.applyForce(new Vec2(0f, -700f), body.getPosition());
                 }

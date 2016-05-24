@@ -4,6 +4,7 @@ import static playn.core.PlayN.*;
 
 import characters.Bird;
 import characters.Food;
+import characters.Rock;
 import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.collision.Manifold;
@@ -37,11 +38,12 @@ public class GameScreen extends Screen {
     private final ImageLayer backButton;
     private Bird bird;
     private List<Food> foodMap;
+    private List<Rock> rockMap;
     private int i = -1;
     public static HashMap<Object,String> bodies = new HashMap<Object, String>();
     public static int k = 0;
     public static int f = -2;
-    public static int f1 = 0;
+    public static int g = 0;
     public static int j = 0;
     public static float x = 0f;
     public static String debugString = "";
@@ -51,6 +53,7 @@ public class GameScreen extends Screen {
         this.ss = ss;
         graphics().rootLayer().clear();
         foodMap = new ArrayList<Food>();
+        rockMap = new ArrayList<Rock>();
         Image bgImage = assets().getImage("images/gameBg.png");
         this.bg = graphics().createImageLayer(bgImage);
 
@@ -75,9 +78,28 @@ public class GameScreen extends Screen {
         world.setWarmStarting(true);
         world.setAutoClearForces(true);
 
-        foodMap.add(new Food(world, 600f, 240f));
+        foodMap.add(new Food(world, 900f, 240f));
         foodMap.add(new Food(world, 1200f, 100f));
         foodMap.add(new Food(world, 300f, 400f));
+
+        rockMap.add(new Rock(world, 700f, 230f));
+        rockMap.add(new Rock(world, 1100f, 110f));
+        rockMap.add(new Rock(world, 200f, 420f));
+        //rockMap.add(new Rock(world, 450f, 110f));
+        //rockMap.add(new Rock(world, 700f, 320f));
+        rockMap.add(new Rock(world, 550f, 275f));
+        rockMap.add(new Rock(world, 1350f, 333f));
+        rockMap.add(new Rock(world, 975f, 123f));
+        rockMap.add(new Rock(world, 489f, 450f));
+        rockMap.add(new Rock(world, 200f, 200f));
+        //rockMap.add(new Rock(world, 450f, 300f));
+        rockMap.add(new Rock(world, 550f, 400f));
+        rockMap.add(new Rock(world, 750f, 100f));
+        //rockMap.add(new Rock(world, 8050f, 250f));
+        rockMap.add(new Rock(world, 1050f, 370f));
+        rockMap.add(new Rock(world, 1150f, 420f));
+        rockMap.add(new Rock(world, 1550f, 160f));
+
         bird = new Bird(world, 100f, 100f);
 
         world.setContactListener(new ContactListener() {
@@ -93,7 +115,7 @@ public class GameScreen extends Screen {
                         debugStringCoin = "Point : " + j;
                         b.setActive(false);
                         food.layer().setVisible(false);
-                        bird.die();
+                        //bird.die();
                         //a.setActive(false);
                     }
                     if ((contact.getFixtureA().getBody() == food.getBody() && contact.getFixtureB().getBody() == bird.getBody())) {
@@ -102,6 +124,27 @@ public class GameScreen extends Screen {
                         debugStringCoin = "Point : " + j;
                         a.setActive(false);
                         food.layer().setVisible(false);
+                        //bird.die();
+                        //b.setActive(false);
+                    }
+                }
+
+                for (Rock rock : rockMap) {
+                    if ((contact.getFixtureA().getBody() == bird.getBody() && contact.getFixtureB().getBody() == rock.getBody())) {
+                        //j = j + 10;
+                        debugString = bodies.get(a) + " contacted with " + bodies.get(b);
+                        debugStringCoin = "Point : " + j;
+                        b.setActive(false);
+                        rock.layer().setVisible(false);
+                        bird.die();
+                        //a.setActive(false);
+                    }
+                    if ((contact.getFixtureA().getBody() == rock.getBody() && contact.getFixtureB().getBody() == bird.getBody())) {
+                        //j = j + 10;
+                        debugString = bodies.get(a) + " contacted with " + bodies.get(b);
+                        debugStringCoin = "Point : " + j;
+                        a.setActive(false);
+                        rock.layer().setVisible(false);
                         bird.die();
                         //b.setActive(false);
                     }
@@ -142,6 +185,10 @@ public class GameScreen extends Screen {
 
         for (Food food : foodMap){
             this.layer.add(food.layer());
+        }
+
+        for (Rock rock : rockMap){
+            this.layer.add(rock.layer());
         }
 
         if (showDebugDraw) {
@@ -199,6 +246,10 @@ public class GameScreen extends Screen {
             food.update(delta);
         }
 
+        for (Rock rock : rockMap){
+            rock.update(delta);
+        }
+
         world.step(0.033f, 10, 10);
     }
 
@@ -209,6 +260,9 @@ public class GameScreen extends Screen {
         for (Food food : foodMap){
             food.paint(clock);
         }
+        for (Rock rock : rockMap){
+            rock.paint(clock);
+        }
 
         if (showDebugDraw) {
             debugDraw.getCanvas().clear();
@@ -218,9 +272,4 @@ public class GameScreen extends Screen {
             world.drawDebugData();
         }
     }
-
-
-    /*public void createFood(int foodTotal) {
-        this.f1 = foodTotal;
-    }*/
 }
