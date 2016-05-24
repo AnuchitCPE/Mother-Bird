@@ -11,7 +11,7 @@ import sprite.SpriteLoader;
 import sut.game01.core.GameScreen;
 
 
-public class Food {
+public class Rock {
     private Sprite sprite;
     private int spriteIndex = 0;
     private boolean hasLoaded = false;
@@ -29,8 +29,8 @@ public class Food {
     private int offset = 0;
 
 
-    public Food(final World world, final float x_px, final float y_px) {
-            sprite = SpriteLoader.getSprite("images/food.json");
+    public Rock(final World world, final float x_px, final float y_px) {
+        sprite = SpriteLoader.getSprite("images/rock.json");
         sprite.addCallback(new Callback<Sprite>() {
             @Override
             public void onSuccess(Sprite result) {
@@ -67,8 +67,8 @@ public class Food {
         body = world.createBody(bodyDef);
         //bodyDef.active = new Boolean(true);
 
-        GameScreen.bodies.put(body, "food_" + GameScreen.f);
-        GameScreen.f++;
+        GameScreen.bodies.put(body, "rock_" + GameScreen.g);
+        GameScreen.g++;
 
         //PolygonShape shape = new PolygonShape();
         /*CircleShape shape = new CircleShape();
