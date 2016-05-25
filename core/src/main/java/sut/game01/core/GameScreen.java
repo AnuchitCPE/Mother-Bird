@@ -33,9 +33,14 @@ public class GameScreen extends Screen {
     private World world;
     private DebugDrawBox2D debugDraw;
     private boolean showDebugDraw = true;
+    private boolean pause = false;
     private final ScreenStack ss;
     private final ImageLayer bg;
     private final ImageLayer backButton;
+    private final ImageLayer star0;
+    private final ImageLayer star1;
+    private final ImageLayer star2;
+    private final ImageLayer star3;
     private Bird bird;
     private List<Food> foodMap;
     private List<Rock> rockMap;
@@ -46,6 +51,7 @@ public class GameScreen extends Screen {
     public static int g = 0;
     public static int j = 0;
     public static float x = 0f;
+    public float b = 0f;
     public static String debugString = "";
     public static String debugStringCoin = "";
 
@@ -71,6 +77,22 @@ public class GameScreen extends Screen {
             }
         });
 
+
+        Image star0Image = assets().getImage("images/star0.png");
+        this.star0 = graphics().createImageLayer(star0Image);
+        star0.setTranslation(220,15);
+
+        Image star1Image = assets().getImage("images/star1.png");
+        this.star1 = graphics().createImageLayer(star1Image);
+        star1.setTranslation(220,15);
+
+        Image star2Image = assets().getImage("images/star2.png");
+        this.star2 = graphics().createImageLayer(star2Image);
+        star2.setTranslation(220,15);
+
+        Image star3Image = assets().getImage("images/star3.png");
+        this.star3 = graphics().createImageLayer(star3Image);
+        star3.setTranslation(220,15);
 
 
         Vec2 gravity = new Vec2(0.0f , 10.0f);
@@ -99,6 +121,7 @@ public class GameScreen extends Screen {
         rockMap.add(new Rock(world, 1050f, 370f));
         rockMap.add(new Rock(world, 1150f, 420f));
         rockMap.add(new Rock(world, 1550f, 160f));
+
 
         bird = new Bird(world, 100f, 100f);
 
@@ -137,7 +160,13 @@ public class GameScreen extends Screen {
                         b.setActive(false);
                         rock.layer().setVisible(false);
                         bird.die();
-                        //a.setActive(false);
+                        for(Rock rock1 : rockMap){
+                            rock1.getBody().setActive(false);
+                        }
+                        for(Food food1 : foodMap){
+                            food1.getBody().setActive(false);
+                        }
+                        //b.setActive(false);
                     }
                     if ((contact.getFixtureA().getBody() == rock.getBody() && contact.getFixtureB().getBody() == bird.getBody())) {
                         //j = j + 10;
@@ -146,7 +175,13 @@ public class GameScreen extends Screen {
                         a.setActive(false);
                         rock.layer().setVisible(false);
                         bird.die();
-                        //b.setActive(false);
+                        for(Rock rock1 : rockMap){
+                            rock1.getBody().setActive(false);
+                        }
+                        for(Food food1 : foodMap){
+                            food1.getBody().setActive(false);
+                        }
+                        //a.setActive(false);
                     }
                 }
             }
@@ -234,41 +269,64 @@ public class GameScreen extends Screen {
 
     @Override
     public void update(int delta) {
-        super.update(delta);
-
-        if (x > -1250f){
-            x -= 0.3f * 5;
-            bg.setTranslation(x,0);
+        if (b < 12) {
+            if (x > -1250f && bird.state != Bird.State.DIE) {
+                x -= 0.3f * 5;
+                bg.setTranslation(x, 0);
+            } else if (x < -1250f){
+                System.out.println(b);
+                bird.getBody().applyForce(new Vec2(120f, 0f), bird.getBody().getPosition());
+                b = bird.getBody().getPosition().x;
+            }
         }
-        bird.update(delta);
-
-        for (Food food : foodMap){
-            food.update(delta);
+        if (b > 12) {
+            pause = true;
         }
+        if (pause == false) {
+            super.update(delta);
+            bird.update(delta);
 
-        for (Rock rock : rockMap){
-            rock.update(delta);
+            for (Food food : foodMap) {
+                food.update(delta);
+            }
+
+            for (Rock rock : rockMap) {
+                rock.update(delta);
+            }
+
+            world.step(0.033f, 10, 10);
+
+
+            if (j == 0) {
+                this.layer.add(star0);
+            } else if (j == 10) {
+                this.layer.add(star1);
+            } else if (j == 20) {
+                this.layer.add(star2);
+            } else if (j == 30) {
+                this.layer.add(star3);
+            }
         }
-
-        world.step(0.033f, 10, 10);
     }
 
     @Override
     public void paint(Clock clock) {
-        super.paint(clock);
-        bird.paint(clock);
-        for (Food food : foodMap){
-            food.paint(clock);
-        }
-        for (Rock rock : rockMap){
-            rock.paint(clock);
+        if (pause == false) {
+            super.paint(clock);
+            bird.paint(clock);
+            for (Food food : foodMap) {
+                food.paint(clock);
+            }
+            for (Rock rock : rockMap) {
+                rock.paint(clock);
+            }
         }
 
         if (showDebugDraw) {
             debugDraw.getCanvas().clear();
             debugDraw.getCanvas().setFillColor(Color.rgb(255, 255, 255));
-            debugDraw.getCanvas().drawText(debugString,100f,50f);
-            debugDraw.getCanvas().drawText(debugStringCoin,100f,100f);
+            debugDraw.getCanvas().drawText(debugString,50f,50f);
+            debugDraw.getCanvas().drawText(debugStringCoin,50f,100f);
             world.drawDebugData();
         }
     }

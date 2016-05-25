@@ -63,7 +63,7 @@ public class Bird {
         GameScreen.k++;
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(90 * GameScreen.M_PER_PIXEL / 2, sprite.layer().height()* GameScreen.M_PER_PIXEL / 2);
+        shape.setAsBox(70 * GameScreen.M_PER_PIXEL / 2, 50* GameScreen.M_PER_PIXEL / 2);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 0.4f;
@@ -88,15 +88,9 @@ public class Bird {
                         case FLY: state = State.DIE; break;
                         case DIE: state = State.IDLE; break;
                     }
-                }else if (event.key() == Key.LEFT) {
-                    state = State.IDLE;
-                    body.applyForce(new Vec2(-80f,0f), body.getPosition());
-                }else if (event.key() == Key.RIGHT) {
-                    state = State.IDLE;
-                    body.applyForce(new Vec2(80f,0f), body.getPosition());
                 }else if (event.key() == Key.UP && state != State.DIE) {
                     state = State.FLY;
-                    body.applyForce(new Vec2(0f, -700f), body.getPosition());
+                    body.applyForce(new Vec2(0f, -500f), body.getPosition());
                 }
             }
         });
