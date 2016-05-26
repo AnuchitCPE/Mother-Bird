@@ -36,11 +36,15 @@ public class GameScreen extends Screen {
     private boolean pause = false;
     private final ScreenStack ss;
     private final ImageLayer bg;
-    private final ImageLayer backButton;
+    private final ImageLayer settingButton;
     private final ImageLayer star0;
     private final ImageLayer star1;
     private final ImageLayer star2;
     private final ImageLayer star3;
+    private final ImageLayer paused;
+    private final ImageLayer resume;
+    private final ImageLayer replay;
+    private final ImageLayer menu;
     private Bird bird;
     private List<Food> foodMap;
     private List<Rock> rockMap;
@@ -63,42 +67,101 @@ public class GameScreen extends Screen {
         Image bgImage = assets().getImage("images/gameBg.png");
         this.bg = graphics().createImageLayer(bgImage);
 
-        Image backImage = assets().getImage("images/back.png");
-        this.backButton = graphics().createImageLayer(backImage);
-        backButton.setTranslation(530,10);
-        backButton.addListener(new Mouse.LayerAdapter() {
+        Image settingImage = assets().getImage("images/setting.png");
+        this.settingButton = graphics().createImageLayer(settingImage);
+        settingButton.setTranslation(550,10);
+        settingButton.addListener(new Mouse.LayerAdapter() {
             @Override
             public void onMouseUp(Mouse.ButtonEvent event) {
-                ss.remove(ss.top());
+                /*ss.remove(ss.top());
                 ss.push(new HomeScreen(ss));
                 j = 0;
                 k = 0;
-                x = 0f;
+                x = 0f;*/
+                pause = true;
+                layer.add(paused);
+                layer.add(resume);
+                layer.add(replay);
+                layer.add(menu);
             }
         });
 
 
         Image star0Image = assets().getImage("images/star0.png");
         this.star0 = graphics().createImageLayer(star0Image);
-        star0.setTranslation(220,15);
+        star0.setTranslation(230,15);
 
         Image star1Image = assets().getImage("images/star1.png");
         this.star1 = graphics().createImageLayer(star1Image);
-        star1.setTranslation(220,15);
+        star1.setTranslation(230,15);
 
         Image star2Image = assets().getImage("images/star2.png");
         this.star2 = graphics().createImageLayer(star2Image);
-        star2.setTranslation(220,15);
+        star2.setTranslation(230,15);
 
         Image star3Image = assets().getImage("images/star3.png");
         this.star3 = graphics().createImageLayer(star3Image);
-        star3.setTranslation(220,15);
+        star3.setTranslation(230,15);
+
+        Image pausedImage = assets().getImage("images/paused.png");
+        this.paused = graphics().createImageLayer(pausedImage);
+        paused.setTranslation(150,150);
+
+        Image resumeImage = assets().getImage("images/resume.png");
+        this.resume = graphics().createImageLayer(resumeImage);
+        resume.setTranslation(205,210);
+        resume.addListener(new Mouse.LayerAdapter() {
+            @Override
+            public void onMouseUp(Mouse.ButtonEvent event) {
+                /*ss.remove(ss.top());
+                ss.push(new HomeScreen(ss));
+                j = 0;
+                k = 0;
+                x = 0f;*/
+                layer.remove(paused);
+                layer.remove(resume);
+                layer.remove(replay);
+                layer.remove(menu);
+                pause = false;
+            }
+        });
+
+        Image replayImage = assets().getImage("images/replay.png");
+        this.replay = graphics().createImageLayer(replayImage);
+        replay.setTranslation(280,210);
+        replay.addListener(new Mouse.LayerAdapter() {
+            @Override
+            public void onMouseUp(Mouse.ButtonEvent event) {
+                j = 0;
+                k = 0;
+                x = 0f;
+                pause = false;
+                ss.remove(ss.top());
+                ss.push(new GameScreen(ss));
+            }
+        });
+
+        Image menuImage = assets().getImage("images/menu.png");
+        this.menu = graphics().createImageLayer(menuImage);
+        menu.setTranslation(360,210);
+        menu.addListener(new Mouse.LayerAdapter() {
+            @Override
+            public void onMouseUp(Mouse.ButtonEvent event) {
+                j = 0;
+                k = 0;
+                x = 0f;
+                pause = false;
+                ss.remove(ss.top());
+                ss.push(new HomeScreen(ss));
+            }
+        });
 
 
         Vec2 gravity = new Vec2(0.0f , 10.0f);
         world = new World(gravity);
         world.setWarmStarting(true);
         world.setAutoClearForces(true);
+
 
         foodMap.add(new Food(world, 900f, 240f));
         foodMap.add(new Food(world, 1200f, 100f));
@@ -215,7 +278,7 @@ public class GameScreen extends Screen {
     public  void  wasShown() {
         super.wasShown();
         this.layer.add(bg);
-        this.layer.add(backButton);
+        this.layer.add(settingButton);
         this.layer.add(bird.layer());
 
         for (Food food : foodMap){
@@ -225,6 +288,18 @@ public class GameScreen extends Screen {
         for (Rock rock : rockMap){
             this.layer.add(rock.layer());
         }
+
+        /*backButton.addListener(new Mouse.LayerAdapter() {
+            @Override
+            public void onMouseUp(Mouse.ButtonEvent event) {
+                ss.remove(ss.top());
+                ss.push(new HomeScreen(ss));
+                j = 0;
+                k = 0;
+                x = 0f;
+                layer.add(paused);
+            }
+        });*/
 
         if (showDebugDraw) {
             CanvasImage image = graphics().createImage(
@@ -269,8 +344,8 @@ public class GameScreen extends Screen {
 
     @Override
     public void update(int delta) {
-        if (b < 12) {
-            if (x > -1250f && bird.state != Bird.State.DIE) {
+        if (b < 25) {
+            if (x > -1250f && bird.state != Bird.State.DIE && pause == false) {
                 x -= 0.3f * 5;
                 bg.setTranslation(x, 0);
             } else if (x < -1250f){
@@ -279,7 +354,7 @@ public class GameScreen extends Screen {
                 b = bird.getBody().getPosition().x;
             }
         }
-        if (b > 12) {
+        if (b > 25) {
             pause = true;
         }
         if (pause == false) {
