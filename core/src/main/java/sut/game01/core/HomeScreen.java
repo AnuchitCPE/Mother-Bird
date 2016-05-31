@@ -11,6 +11,7 @@ public class HomeScreen extends Screen {
 
     private ScreenStack ss;
     private final GameScreen gameScreen;
+    private final LevelSelect levelSelect;
     private final ImageLayer homeBg;
     private final ImageLayer startButton;
     private final ImageLayer logo;
@@ -18,6 +19,7 @@ public class HomeScreen extends Screen {
     public HomeScreen(final ScreenStack ss) {
         this.ss = ss;
         this.gameScreen = new GameScreen(ss);
+        this.levelSelect = new LevelSelect(ss);
 
         Image homeBgImage = assets().getImage("images/homeBg.png");
         this.homeBg = graphics().createImageLayer(homeBgImage);
@@ -33,7 +35,7 @@ public class HomeScreen extends Screen {
             @Override
             public void onMouseUp(Mouse.ButtonEvent event) {
                 ss.remove(ss.top());
-                ss.push(new GameScreen(ss));
+                ss.push(new LevelSelect(ss));
             }
         });
     }
@@ -44,13 +46,13 @@ public class HomeScreen extends Screen {
         this.layer.add(homeBg);
         this.layer.add(logo);
         this.layer.add(startButton);
-        keyboard().setListener(new Keyboard.Adapter(){
+        /*keyboard().setListener(new Keyboard.Adapter(){
             @Override
             public void onKeyUp(Keyboard.Event event) {
                 if (event.key() == Key.ENTER) {
                     ss.push(gameScreen);
                 }
             }
-        });
+        });*/
     }
 }
