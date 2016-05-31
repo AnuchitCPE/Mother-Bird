@@ -44,7 +44,16 @@ public class GameScreen extends Screen {
     private final ImageLayer paused;
     private final ImageLayer resume;
     private final ImageLayer replay;
+    private final ImageLayer replay1;
     private final ImageLayer menu;
+    private final ImageLayer menu1;
+    private final ImageLayer nextLevel;
+    private final ImageLayer overMenu;
+    private final ImageLayer overReplay;
+    private final ImageLayer gameOver;
+    private final ImageLayer cleared1;
+    private final ImageLayer cleared2;
+    private final ImageLayer cleared3;
     private Bird bird;
     private List<Food> foodMap;
     private List<Rock> rockMap;
@@ -53,9 +62,11 @@ public class GameScreen extends Screen {
     public static int k = 0;
     public static int f = -2;
     public static int g = 0;
+    public static int w = 0;
     public static int j = 0;
     public static float x = 0f;
     public float b = 0f;
+    public float c = 0f;
     public static String debugString = "";
     public static String debugStringCoin = "";
 
@@ -105,7 +116,7 @@ public class GameScreen extends Screen {
 
         Image pausedImage = assets().getImage("images/paused.png");
         this.paused = graphics().createImageLayer(pausedImage);
-        paused.setTranslation(150,150);
+        //paused.setTranslation(150,150);
 
         Image resumeImage = assets().getImage("images/resume.png");
         this.resume = graphics().createImageLayer(resumeImage);
@@ -152,10 +163,100 @@ public class GameScreen extends Screen {
                 x = 0f;
                 pause = false;
                 ss.remove(ss.top());
-                ss.push(new HomeScreen(ss));
+                ss.push(new LevelSelect(ss));
             }
         });
 
+
+        Image menu1Image = assets().getImage("images/replay1.png");
+        this.menu1 = graphics().createImageLayer(menu1Image);
+        menu1.setTranslation(247,343);
+        menu1.addListener(new Mouse.LayerAdapter() {
+            @Override
+            public void onMouseUp(Mouse.ButtonEvent event) {
+                j = 0;
+                k = 0;
+                x = 0f;
+                pause = false;
+                ss.remove(ss.top());
+                ss.push(new LevelSelect(ss));
+            }
+        });
+
+        Image replay1Image = assets().getImage("images/replay1.png");
+        this.replay1 = graphics().createImageLayer(replay1Image);
+        replay1.setTranslation(309,343);
+        replay1.addListener(new Mouse.LayerAdapter() {
+            @Override
+            public void onMouseUp(Mouse.ButtonEvent event) {
+                j = 0;
+                k = 0;
+                x = 0f;
+                pause = false;
+                ss.remove(ss.top());
+                ss.push(new GameScreen(ss));
+            }
+        });
+
+        Image nextLevelImage = assets().getImage("images/replay1.png");
+        this.nextLevel = graphics().createImageLayer(nextLevelImage);
+        nextLevel.setTranslation(373,343);
+        nextLevel.addListener(new Mouse.LayerAdapter() {
+            @Override
+            public void onMouseUp(Mouse.ButtonEvent event) {
+                j = 0;
+                k = 0;
+                x = 0f;
+                pause = false;
+                ss.remove(ss.top());
+                ss.push(new GameScreen2(ss));
+            }
+        });
+
+        Image overMenuImage = assets().getImage("images/over.png");
+        this.overMenu = graphics().createImageLayer(overMenuImage);
+        overMenu.setTranslation(261,338);
+        overMenu.addListener(new Mouse.LayerAdapter() {
+            @Override
+            public void onMouseUp(Mouse.ButtonEvent event) {
+                j = 0;
+                k = 0;
+                x = 0f;
+                pause = false;
+                ss.remove(ss.top());
+                ss.push(new LevelSelect(ss));
+            }
+        });
+
+
+        Image overReplayImage = assets().getImage("images/over.png");
+        this.overReplay = graphics().createImageLayer(overReplayImage);
+        overReplay.setTranslation(340,338);
+        overReplay.addListener(new Mouse.LayerAdapter() {
+            @Override
+            public void onMouseUp(Mouse.ButtonEvent event) {
+                j = 0;
+                k = 0;
+                x = 0f;
+                pause = false;
+                ss.remove(ss.top());
+                ss.push(new GameScreen(ss));
+            }
+        });
+
+
+
+        Image gameOverImage = assets().getImage("images/gameOver.png");
+        this.gameOver = graphics().createImageLayer(gameOverImage);
+
+        Image cleared1Image = assets().getImage("images/cleared1.png");
+        this.cleared1 = graphics().createImageLayer(cleared1Image);
+
+        Image cleared2Image = assets().getImage("images/cleared2.png");
+        this.cleared2 = graphics().createImageLayer(cleared2Image);
+
+        Image cleared3Image = assets().getImage("images/cleared3.png");
+        this.cleared3 = graphics().createImageLayer(cleared3Image);
 
         Vec2 gravity = new Vec2(0.0f , 10.0f);
         world = new World(gravity);
@@ -184,6 +285,10 @@ public class GameScreen extends Screen {
         rockMap.add(new Rock(world, 1050f, 370f));
         rockMap.add(new Rock(world, 1150f, 420f));
         rockMap.add(new Rock(world, 1550f, 160f));
+        rockMap.add(new Rock(world, 1800f, 400f));
+        rockMap.add(new Rock(world, 1900f, 325f));
+        rockMap.add(new Rock(world, 1950f, 250f));
+        rockMap.add(new Rock(world, 2000f, 100f));
 
 
         bird = new Bird(world, 100f, 100f);
@@ -201,8 +306,6 @@ public class GameScreen extends Screen {
                         debugStringCoin = "Point : " + j;
                         b.setActive(false);
                         food.layer().setVisible(false);
-                        //bird.die();
-                        //a.setActive(false);
                     }
                     if ((contact.getFixtureA().getBody() == food.getBody() && contact.getFixtureB().getBody() == bird.getBody())) {
                         j = j + 10;
@@ -210,14 +313,11 @@ public class GameScreen extends Screen {
                         debugStringCoin = "Point : " + j;
                         a.setActive(false);
                         food.layer().setVisible(false);
-                        //bird.die();
-                        //b.setActive(false);
                     }
                 }
 
                 for (Rock rock : rockMap) {
                     if ((contact.getFixtureA().getBody() == bird.getBody() && contact.getFixtureB().getBody() == rock.getBody())) {
-                        //j = j + 10;
                         debugString = bodies.get(a) + " contacted with " + bodies.get(b);
                         debugStringCoin = "Point : " + j;
                         b.setActive(false);
@@ -229,10 +329,8 @@ public class GameScreen extends Screen {
                         for(Food food1 : foodMap){
                             food1.getBody().setActive(false);
                         }
-                        //b.setActive(false);
                     }
                     if ((contact.getFixtureA().getBody() == rock.getBody() && contact.getFixtureB().getBody() == bird.getBody())) {
-                        //j = j + 10;
                         debugString = bodies.get(a) + " contacted with " + bodies.get(b);
                         debugStringCoin = "Point : " + j;
                         a.setActive(false);
@@ -244,7 +342,6 @@ public class GameScreen extends Screen {
                         for(Food food1 : foodMap){
                             food1.getBody().setActive(false);
                         }
-                        //a.setActive(false);
                     }
                 }
             }
@@ -344,19 +441,47 @@ public class GameScreen extends Screen {
 
     @Override
     public void update(int delta) {
-        if (b < 25) {
+        if (b < 27) {
             if (x > -1250f && bird.state != Bird.State.DIE && pause == false) {
                 x -= 0.3f * 5;
                 bg.setTranslation(x, 0);
             } else if (x < -1250f){
-                System.out.println(b);
                 bird.getBody().applyForce(new Vec2(120f, 0f), bird.getBody().getPosition());
                 b = bird.getBody().getPosition().x;
             }
-        }
-        if (b > 25) {
+        } else if (b > 27) {
             pause = true;
+            if (j == 0) {
+                this.layer.add(gameOver);
+                this.layer.add(overMenu);
+                this.layer.add(overReplay);
+            } else if (j == 10) {
+                this.layer.add(cleared1);
+                this.layer.add(menu1);
+                this.layer.add(replay1);
+                this.layer.add(nextLevel);
+            } else if (j == 20) {
+                this.layer.add(cleared2);
+                this.layer.add(menu1);
+                this.layer.add(replay1);
+                this.layer.add(nextLevel);
+            } else if (j == 30) {
+                this.layer.add(cleared3);
+                this.layer.add(menu1);
+                this.layer.add(replay1);
+                this.layer.add(nextLevel);
+            }
         }
+
+        if (bird.state == Bird.State.DIE){
+            c = bird.getBody().getPosition().y;
+            if (c > 17) {
+                this.layer.add(gameOver);
+                this.layer.add(overMenu);
+                this.layer.add(overReplay);
+            }
+        }
+
         if (pause == false) {
             super.update(delta);
             bird.update(delta);

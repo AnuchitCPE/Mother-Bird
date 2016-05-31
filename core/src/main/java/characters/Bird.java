@@ -82,13 +82,14 @@ public class Bird {
         PlayN.keyboard().setListener(new Keyboard.Adapter(){
             @Override
             public void onKeyUp(Keyboard.Event event) {
-                if(event.key() == Key.SPACE) {
+                /*if(event.key() == Key.SPACE) {
                     switch (state) {
                         case IDLE: state = State.FLY; break;
                         case FLY: state = State.DIE; break;
                         case DIE: state = State.IDLE; break;
                     }
-                }else if (event.key() == Key.UP && state != State.DIE) {
+                }*/
+                if (event.key() == Key.UP && state != State.DIE) {
                     state = State.FLY;
                     body.applyForce(new Vec2(0f, -500f), body.getPosition());
                 }
