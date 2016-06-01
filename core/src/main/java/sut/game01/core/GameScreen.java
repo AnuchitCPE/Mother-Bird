@@ -89,11 +89,13 @@ public class GameScreen extends Screen {
                 j = 0;
                 k = 0;
                 x = 0f;*/
-                pause = true;
-                layer.add(paused);
-                layer.add(resume);
-                layer.add(replay);
-                layer.add(menu);
+                if (bird.state != Bird.State.DIE) {
+                    pause = true;
+                    layer.add(paused);
+                    layer.add(resume);
+                    layer.add(replay);
+                    layer.add(menu);
+                }
             }
         });
 
